@@ -1,0 +1,37 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    /* background:url('/modat/src/images/backgroundlogin.png'); */
+    background-size: cover;
+    background-attachment: fixed;
+   
+    }
+      .boton {
+        text-align:center;
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        top: 100%;
+        
+
+        }
+        .boton1 {
+            margin-bottom: 10px;
+            border: 2px solid rgba(211, 28, 28, 0);
+
+            width: 150px;
+            color: rgb(255, 255, 255);
+         font-size: 20px;
+        background: rgb(62, 98, 218);
+        padding: 15px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-block-start: 5%;
+
+        }
+        
+      
