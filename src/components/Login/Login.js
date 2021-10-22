@@ -1,3 +1,4 @@
+import back from "../assets/img/backgroundlogin.jpeg";
 import React, { useEffect, useState } from "react";
 import {
   Button,
@@ -14,7 +15,7 @@ import {
 } from "../Firebase/Firebase";
 import { useHistory } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
-
+import '../Login/style.css';
 function Login() {
 
 
@@ -26,15 +27,18 @@ function Login() {
 
   useEffect(() => {
     if (loading) {
-      // maybe trigger a loading screen
+      
       return;
     }
-    if (user) { history.replace("/users"); }
+    if (user) { history.replace("/user"); }
   }, [user, loading]);
   
 
   return (
-    <Container>
+    <body background= {back}>
+    <div class="row vh-100 justify-content-center align-items-center" id="contenedor">
+       <div class="col-sm-4 bg-ligth p-4">       
+         <Container className= "blanco">
         <FormGroup>
           <label>
             Email:
@@ -59,12 +63,17 @@ function Login() {
             type="password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
+            placeholder="Password"
             required
           />
         </FormGroup>
 
-        <ButtonGroup>
-          <Button
+        <ButtonGroup className="boton">
+        <div class="form-group">
+           <div class="col-lg-offset-2 col-lg-10"> 
+       
+          <Button className ="boton1"
+            
             color="primary"
             type="submit"
             onClick={() => signInEmailAndPassword(email, password)}
@@ -78,6 +87,9 @@ function Login() {
           >
             Login con Google
           </Button>
+         </div>
+         </div>
+
         </ButtonGroup>
 
 
@@ -87,8 +99,12 @@ function Login() {
         <ListGroupItem tag="a" href="/reset">Olvide mi clave</ListGroupItem>
         <ListGroupItem tag="a" href="/register">Crea tu cuenta</ListGroupItem>
       </ListGroup>
-
+     
     </Container>
+    </div>
+    </div>
+    </body>
+    
   );
 }
 export default Login;
