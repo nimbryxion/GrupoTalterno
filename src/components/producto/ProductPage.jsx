@@ -5,7 +5,7 @@ import { Table, Button, Container, Modal, ModalHeader, ModalBody, FormGroup, Mod
 import images from '../assets/imges';
 import './ProductStyle.css';
 const BASE_URL = process.env.REACT_APP_API_URL;
-const PATH_CUSTOMERS = 'vendedores';
+const PATH_PRODUCTOS = 'productos';
 
 class User extends React.Component {
 
@@ -14,6 +14,7 @@ class User extends React.Component {
 
         this.state = {
             data: [],
+            
             modalActualizar: false,
             modalInsertar: false,
             form: {
@@ -27,7 +28,7 @@ class User extends React.Component {
     }
 
     componentDidMount() {
-        this.cargarCustomers();
+        this.cargarProductos();
     }
 
     mostrarModalActualizar = (dato) => {
@@ -57,14 +58,14 @@ class User extends React.Component {
     };
 
     editar = (dato) => {
-        this.actualizarCustomer(dato);
+        this.actualizarProducto(dato);
         this.setState({ modalActualizar: false });
     };
 
     eliminar = (dato) => {
         let opcion = window.confirm("¿Está seguro que desea eliminar a " + dato.valorunitario + "?");
         if (opcion) {
-            this.borrarCustomer(dato._id)
+            this.borrarProducto(dato._id)
         }
 
     };
@@ -72,10 +73,12 @@ class User extends React.Component {
     insertar = () => {
         let usuarioACrear = { ...this.state.form };
 
-        this.crearCustomer(usuarioACrear);
+        this.crearProducto(usuarioACrear);
         this.setState({ modalInsertar: false });
 
     }
+
+    
 
     handleChange = (e) => {
         this.setState({
@@ -93,213 +96,214 @@ class User extends React.Component {
                 <NavbarComponents />
                 <body background={images.foto1} >
 
-                <Container>
-                    <div className="background">
-                        <div className="container">
-                            <div className="mt-3">
-                                <div className="row">
-                                    <nav className="navbar navbar-light navbar-ventas">
-                                        <div className="container-fluid">
-                                            <a className="navbar-brand"> <i className="bi bi-file-earmark-plus"></i> Productos </a>
-                                        </div>
-                                    </nav>
+                    <Container>
+                        <div className="background">
+                            <div className="container">
+                                <div className="mt-3">
+                                    <div className="row">
+                                        <nav className="navbar navbar-light navbar-ventas">
+                                            <div className="container-fluid">
+                                                <a className="navbar-brand"> <i className="bi bi-file-earmark-plus"></i> Productos </a>
+                                            </div>
+                                        </nav>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <br />
-                    <Button color="primary" onClick={() => this.mostrarModalInsertar()}>Ingresar Producto</Button>
-                    <br />
-                    <br />
-                    <Table>
-                        {this.state.mostrarCargando ? (
-                            <Spinner
-                                size="xl" type="grow"
-                                color="success"
-                            />
-                        ) : null}
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Valor Unitario</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {this.state.data.map((dato) => (
-                                <tr key={dato._id}>
-                                    <td>{dato.producto}</td>
-                                    <td>{dato.valorunitario}</td>
-                                    <td>{dato.estado}</td>
-                                    <td>
-                                        <Button
-                                            color="primary"
-                                            onClick={() => this.mostrarModalActualizar(dato)}
-                                        >
-                                            Editar
-                                        </Button>{" "}
-                                        <Button color="danger" onClick={() => this.eliminar(dato)}>Eliminar</Button>
-                                    </td>
+                        <input class="form-control col-md-4" placeholder="Buscar......" value={this.state.text} onChange={(text) => this.buscar(text)} />
+                        <br />
+                        <Button color="primary" onClick={() => this.mostrarModalInsertar()}>Ingresar Producto</Button>
+                        <br />
+                        <br />
+                        <Table>
+                            {this.state.mostrarCargando ? (
+                                <Spinner
+                                    size="xl" type="grow"
+                                    color="success"
+                                />
+                            ) : null}
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Valor Unitario</th>
+                                    <th>Estado</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </Table>
-                </Container>
+                            </thead>
 
-                <Modal isOpen={this.state.modalActualizar}>
-                    <ModalHeader>
-                        <div><h3>Actualizar Producto {this.state.form._id}</h3></div>
-                    </ModalHeader>
+                            <tbody>
+                                {this.state.data.map((dato) => (
+                                    <tr key={dato._id}>
+                                        <td>{dato.producto}</td>
+                                        <td>{dato.valorunitario}</td>
+                                        <td>{dato.estado}</td>
+                                        <td>
+                                            <Button
+                                                color="primary"
+                                                onClick={() => this.mostrarModalActualizar(dato)}
+                                            >
+                                                Editar
+                                            </Button>{" "}
+                                            <Button color="danger" onClick={() => this.eliminar(dato)}>Eliminar</Button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    </Container>
 
-                    <ModalBody>
-                        <FormGroup>
-                            <label>
-                                Id:
-                            </label>
+                    <Modal isOpen={this.state.modalActualizar}>
+                        <ModalHeader>
+                            <div><h3>Actualizar Producto {this.state.form._id}</h3></div>
+                        </ModalHeader>
 
-                            <input
-                                className="form-control"
-                                readOnly
-                                type="text"
-                                value={this.state.form._id}
-                            />
-                        </FormGroup>
+                        <ModalBody>
+                            <FormGroup>
+                                <label>
+                                    Id:
+                                </label>
 
-                        <FormGroup>
-                            <label>
-                                Producto
-                            </label>
-                            <input
-                                className="form-control"
-                                name="producto"
-                                type="text"
-                                onChange={this.handleChange}
-                                value={this.state.form.producto}
-                                required
-                            />
-                        </FormGroup>
+                                <input
+                                    className="form-control"
+                                    readOnly
+                                    type="text"
+                                    value={this.state.form._id}
+                                />
+                            </FormGroup>
 
-                        <FormGroup>
-                            <label>
-                                Valor Unitario
-                            </label>
-                            <input
-                                className="form-control"
-                                name="valorunitario"
-                                type="text"
-                                onChange={this.handleChange}
-                                value={this.state.form.valorunitario}
-                            />
-                        </FormGroup>
+                            <FormGroup>
+                                <label>
+                                    Producto
+                                </label>
+                                <input
+                                    className="form-control"
+                                    name="producto"
+                                    type="text"
+                                    onChange={this.handleChange}
+                                    value={this.state.form.producto}
+                                    required
+                                />
+                            </FormGroup>
 
-                        <FormGroup>
-                            <label>
-                                Estado:
-                            </label>
-                            <input
-                                className="form-control"
-                                name="estado"
-                                type="text"
-                                onChange={this.handleChange}
-                                value={this.state.form.estado}
-                            />
-                        </FormGroup>
+                            <FormGroup>
+                                <label>
+                                    Valor Unitario
+                                </label>
+                                <input
+                                    className="form-control"
+                                    name="valorunitario"
+                                    type="text"
+                                    onChange={this.handleChange}
+                                    value={this.state.form.valorunitario}
+                                />
+                            </FormGroup>
 
-
-                    </ModalBody>
-
-                    <ModalFooter>
-                        <Button
-                            color="primary"
-                            onClick={() => this.editar(this.state.form)}
-                        >
-                            Actualizar
-                        </Button>
-                        <Button
-                            className="btn btn-danger"
-                            onClick={() => this.cerrarModalActualizar()}
-                        >
-                            Cancelar
-                        </Button>
-                    </ModalFooter>
-                </Modal>
-
+                            <FormGroup>
+                                <label>
+                                    Estado:
+                                </label>
+                                <input
+                                    className="form-control"
+                                    name="estado"
+                                    type="text"
+                                    onChange={this.handleChange}
+                                    value={this.state.form.estado}
+                                />
+                            </FormGroup>
 
 
-                <Modal isOpen={this.state.modalInsertar}>
-                    <ModalHeader>
-                        <div><h3>Ingresar Producto</h3></div>
-                    </ModalHeader>
+                        </ModalBody>
 
-                    <ModalBody>
-
-                        <FormGroup>
-                            <label>
-                                Producto
-                            </label>
-                            <input
-                                className="form-control"
-                                name="producto"
-                                type="text"
-                                onChange={this.handleChange}
-                                required
-                            />
-                        </FormGroup>
-
-                        <FormGroup>
-                            <label>
-                                Valor Unitario
-                            </label>
-                            <input
-                                className="form-control"
-                                name="valorunitario"
-                                type="text"
-                                onChange={this.handleChange}
-                            />
-                        </FormGroup>
-
-                        <FormGroup>
-                            <label>
-                                Estado:
-                            </label>
-                            <input
-                                className="form-control"
-                                name="estado"
-                                type="text"
-                                onChange={this.handleChange}
-                            />
-                        </FormGroup>
+                        <ModalFooter>
+                            <Button
+                                color="primary"
+                                onClick={() => this.editar(this.state.form)}
+                            >
+                                Actualizar
+                            </Button>
+                            <Button
+                                className="btn btn-danger"
+                                onClick={() => this.cerrarModalActualizar()}
+                            >
+                                Cancelar
+                            </Button>
+                        </ModalFooter>
+                    </Modal>
 
 
-                    </ModalBody>
 
-                    <ModalFooter>
-                        <Button
-                            color="primary"
-                            onClick={() => this.insertar()}
-                        >
-                            Insertar
-                        </Button>
-                        <Button
-                            className="btn btn-danger"
-                            onClick={() => this.cerrarModalInsertar()}
-                        >
-                            Cancelar
-                        </Button>
-                    </ModalFooter>
-                </Modal>
+                    <Modal isOpen={this.state.modalInsertar}>
+                        <ModalHeader>
+                            <div><h3>Ingresar Producto</h3></div>
+                        </ModalHeader>
+
+                        <ModalBody>
+
+                            <FormGroup>
+                                <label>
+                                    Producto
+                                </label>
+                                <input
+                                    className="form-control"
+                                    name="producto"
+                                    type="text"
+                                    onChange={this.handleChange}
+                                    required
+                                />
+                            </FormGroup>
+
+                            <FormGroup>
+                                <label>
+                                    Valor Unitario
+                                </label>
+                                <input
+                                    className="form-control"
+                                    name="valorunitario"
+                                    type="text"
+                                    onChange={this.handleChange}
+                                />
+                            </FormGroup>
+
+                            <FormGroup>
+                                <label>
+                                    Estado:
+                                </label>
+                                <input
+                                    className="form-control"
+                                    name="estado"
+                                    type="text"
+                                    onChange={this.handleChange}
+                                />
+                            </FormGroup>
+
+
+                        </ModalBody>
+
+                        <ModalFooter>
+                            <Button
+                                color="primary"
+                                onClick={() => this.insertar()}
+                            >
+                                Insertar
+                            </Button>
+                            <Button
+                                className="btn btn-danger"
+                                onClick={() => this.cerrarModalInsertar()}
+                            >
+                                Cancelar
+                            </Button>
+                        </ModalFooter>
+                    </Modal>
                 </body >
                 <Footer />
-                
+
             </>
         );
     }
 
 
-    cargarCustomers() {
+    cargarProductos() {
         this.setState({ mostrarCargando: true });
-        fetch(`${BASE_URL}${PATH_CUSTOMERS}`)
+        fetch(`${BASE_URL}${PATH_PRODUCTOS}`)
             .then(result => result.json())
             .then(
                 (result) => {
@@ -315,17 +319,17 @@ class User extends React.Component {
     }
 
 
-    crearCustomer(customer) {
+    crearProducto(producto) {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(customer)
+            body: JSON.stringify(producto)
         };
-        fetch(`${BASE_URL}${PATH_CUSTOMERS}`, requestOptions)
+        fetch(`${BASE_URL}${PATH_PRODUCTOS}`, requestOptions)
             .then(result => result.json())
             .then(
                 (result) => {
-                    this.cargarCustomers();
+                    this.cargarProductos();
                 },
                 (error) => {
                     console.log(error);
@@ -338,11 +342,11 @@ class User extends React.Component {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' }
         };
-        fetch(`${BASE_URL}${PATH_CUSTOMERS}/${id}`, requestOptions)
+        fetch(`${BASE_URL}${PATH_PRODUCTOS}/${id}`, requestOptions)
             .then(result => result.json())
             .then(
                 (result) => {
-                    this.cargarCustomers();
+                    this.cargarProductos();
                 },
                 (error) => {
                     console.log(error);
@@ -350,17 +354,35 @@ class User extends React.Component {
             );
     }
 
-    actualizarCustomer(customer) {
+    actualizarProducto(producto) {
         const requestOptions = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(customer)
+            body: JSON.stringify(producto)
         };
-        fetch(`${BASE_URL}${PATH_CUSTOMERS}/${customer._id}`, requestOptions)
+        fetch(`${BASE_URL}${PATH_PRODUCTOS}/${producto._id}`, requestOptions)
             .then(result => result.json())
             .then(
                 (result) => {
-                    this.cargarCustomers();
+                    this.cargarProductos();
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+    }
+
+    buscarCustomer(producto) {
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(producto)
+        };
+        fetch(`${BASE_URL}${PATH_PRODUCTOS}/${producto._id}`, requestOptions)
+            .then(result => result.json())
+            .then(
+                (result) => {
+                    this.cargarProductos();
                 },
                 (error) => {
                     console.log(error);
