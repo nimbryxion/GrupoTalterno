@@ -4,10 +4,11 @@ import Footer from '../shared/components/footer/Footer';
 import { Table, Button, Container, Modal, ModalHeader, ModalBody, FormGroup, ModalFooter, Spinner } from "reactstrap";
 import images from '../assets/imges';
 import './ProductStyle.css';
-const BASE_URL = process.env.REACT_APP_API_URL;
-const PATH_PRODUCTOS = 'productos';
 
-class User extends React.Component {
+const BASE_URL = process.env.REACT_APP_API_URL;
+const PATH_PRODUCTOS= 'productos';
+
+class Producto extends React.Component {
 
     constructor(props) {
         super(props);
@@ -20,7 +21,7 @@ class User extends React.Component {
             form: {
                 _id: "",
                 producto: "",
-                valorunitario: "",
+                valorUnitario: "",
                 estado: ""
             },
             mostrarCargando: false
@@ -47,7 +48,7 @@ class User extends React.Component {
 
                 _id: "",
                 producto: "",
-                valorunitario: "",
+                valorUnitario: "",
                 estado: ""
             }
         });
@@ -63,7 +64,7 @@ class User extends React.Component {
     };
 
     eliminar = (dato) => {
-        let opcion = window.confirm("¿Está seguro que desea eliminar a " + dato.valorunitario + "?");
+        let opcion = window.confirm("¿Está seguro que desea eliminar a " + dato.valorUnitario + "?");
         if (opcion) {
             this.borrarProducto(dato._id)
         }
@@ -71,9 +72,9 @@ class User extends React.Component {
     };
 
     insertar = () => {
-        let usuarioACrear = { ...this.state.form };
+        let ProductoACrear = { ...this.state.form };
 
-        this.crearProducto(usuarioACrear);
+        this.crearProducto(ProductoACrear);
         this.setState({ modalInsertar: false });
 
     }
@@ -94,7 +95,7 @@ class User extends React.Component {
         return (
             <>
                 <NavbarComponents />
-                <body background={images.foto1} >
+                {/* <body background={images.foto1} > */}
 
                     <Container>
                         <div className="background">
@@ -133,8 +134,8 @@ class User extends React.Component {
                             <tbody>
                                 {this.state.data.map((dato) => (
                                     <tr key={dato._id}>
-                                        <td>{dato.producto}</td>
-                                        <td>{dato.valorunitario}</td>
+                                        <td>{dato.Producto}</td>
+                                        <td>{dato.valorUnitario}</td>
                                         <td>{dato.estado}</td>
                                         <td>
                                             <Button
@@ -176,7 +177,7 @@ class User extends React.Component {
                                 </label>
                                 <input
                                     className="form-control"
-                                    name="producto"
+                                    name="Producto"
                                     type="text"
                                     onChange={this.handleChange}
                                     value={this.state.form.producto}
@@ -190,10 +191,10 @@ class User extends React.Component {
                                 </label>
                                 <input
                                     className="form-control"
-                                    name="valorunitario"
+                                    name="valorUnitario"
                                     type="text"
                                     onChange={this.handleChange}
-                                    value={this.state.form.valorunitario}
+                                    value={this.state.form.valorUnitario}
                                 />
                             </FormGroup>
 
@@ -244,7 +245,7 @@ class User extends React.Component {
                                 </label>
                                 <input
                                     className="form-control"
-                                    name="producto"
+                                    name="Producto"
                                     type="text"
                                     onChange={this.handleChange}
                                     required
@@ -257,7 +258,7 @@ class User extends React.Component {
                                 </label>
                                 <input
                                     className="form-control"
-                                    name="valorunitario"
+                                    name="valorUnitario"
                                     type="text"
                                     onChange={this.handleChange}
                                 />
@@ -293,7 +294,7 @@ class User extends React.Component {
                             </Button>
                         </ModalFooter>
                     </Modal>
-                </body >
+                {/* </body > */}
                 <Footer />
 
             </>
@@ -337,7 +338,7 @@ class User extends React.Component {
             );
     }
 
-    borrarCustomer(id) {
+    borrarProducto(id) {
         const requestOptions = {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' }
@@ -372,23 +373,23 @@ class User extends React.Component {
             );
     }
 
-    buscarCustomer(producto) {
-        const requestOptions = {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(producto)
-        };
-        fetch(`${BASE_URL}${PATH_PRODUCTOS}/${producto._id}`, requestOptions)
-            .then(result => result.json())
-            .then(
-                (result) => {
-                    this.cargarProductos();
-                },
-                (error) => {
-                    console.log(error);
-                }
-            );
+    // buscarCustomer(producto) {
+    //     const requestOptions = {
+    //         method: 'GET',
+    //         headers: { 'Content-Type': 'application/json' },
+    //         body: JSON.stringify(producto)
+    //     };
+    //     fetch(`${BASE_URL}${PATH_PRODUCTOS}/${producto._id}`, requestOptions)
+    //         .then(result => result.json())
+    //         .then(
+    //             (result) => {
+    //                 this.cargarProductos();
+    //             },
+    //             (error) => {
+    //                 console.log(error);
+    //             }
+        
     }
 
-}
-export default User;
+
+export default Producto;

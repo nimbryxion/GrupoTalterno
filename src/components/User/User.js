@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Alert,
   Table,
   Button,
   Container,
@@ -9,237 +8,119 @@ import {
   ModalBody,
   FormGroup,
   ModalFooter,
-  Row,
-  Col
+  Spinner
 } from "reactstrap";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useHistory } from "react-router";
-import { getAuth } from "firebase/auth";
+import NavbarComponents from '../shared/components/navbar/NavbarComponents';
+import Footer from '../shared/components/footer/Footer';
+import images from '../assets/imges';
 
-const data = [
-];
 
 const BASE_URL = process.env.REACT_APP_API_URL;
 const PATH_CUSTOMERS = 'vendedores';
 
-const User = () => {
+class User extends React.Component {
 
-  const auth = getAuth();
-  const [modalActualizar, setModalActualizar] = React.useState(false);
-  const [modalInsertar, setModalInsertar] = React.useState(false);
-  const [isLoaded, setIsLoaded] = React.useState(false);
-  const [errors, setErrors] = React.useState(null);
-  const [newVal, setNewVal] = React.useState(0);
-  const [user, loading, error] = useAuthState(auth);
-  const [name, setName] = React.useState("");
-  const history = useHistory();
-  
-  const logout = () => {
-    auth.signOut().then(function () {
-      // Sign-out successful.
-      console.log("loggedout");
-    }).catch((error) => {
-      // An error happened.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-    });
-  };
+  constructor(props) {
+    super(props);
 
-  const [usuario, setUsuario] = React.useState({
-    data: data,
-    form: {
-      email: "",
-      phoneNumber: "",
-      address: "",
-      firstName: "",
-      lastName: ""
-    }
-  });
-
-  React.useEffect(() => {
-    if (loading) return;
-    if (!user) return history.replace("/");
-  }, [user, loading]);
-
-  React.useEffect(() => {
-    if (!user) return history.replace("/");
-    user.getIdToken(true).then(token => {
-      const requestOptions = {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      };
-      fetch(`${BASE_URL}${PATH_CUSTOMERS}`, requestOptions)
-        .then(res => res.json())
-        .then(
-          (result) => {
-            setIsLoaded(true);
-            setUsuario({
-              ...usuario,
-              data: result
-            });
-          },
-          (error) => {
-            setIsLoaded(true);
-            setErrors(error);
-          }
-        )
-    });
-  }, [newVal]);
-
-  const handleChange = (e) => {
-    setUsuario((prevState) => ({
-      ...prevState,
+    this.state = {
+      data: [],
+      modalActualizar: false,
+      modalInsertar: false,
       form: {
-        ...prevState.form,
-        [e.target.name]: e.target.value,
-      }
-    }));
-  };
-
-  const mostrarModalActualizar = (e) => {
-    let arregloUsuarios = usuario.data;
-    let userToModify;
-    arregloUsuarios.map((registro) => {
-      if (e.target.id === registro._id) {
-        userToModify = registro;
-      }
-    });
-    setUsuario({
-      ...usuario,
-      form: userToModify
-    });
-    setModalActualizar(true);
-  };
-
-  const cerrarModalActualizar = () => {
-    setModalActualizar(false);
-  };
-
-  const mostrarModalInsertar = () => {
-    setModalInsertar(true);
-  };
-
-  const cerrarModalInsertar = () => {
-    setModalInsertar(false);
-  };
-
-  const editar = () => {
-    let usuarioAModificar = { ...usuario.form };
-    actualizarCustomer(usuarioAModificar);
-    setModalActualizar(false);
-    setNewVal(newVal + 1);
-  };
-
-  const eliminar = (e) => {
-    let arregloUsuarios = usuario.data;
-    arregloUsuarios.map((registro) => {
-      if (e.target.id === registro._id) {
-        let opcion = window.confirm("¿Está seguro que desea eliminar el valor " + registro.firstName + "?");
-        if (opcion) {
-          borrarCustomer(registro._id);
-        }
-      }
-    });
-    setNewVal(newVal + 1);
-  };
-
-  const insertar = () => {
-    let usuarioACrear = { ...usuario.form };
-    user.getIdToken(true).then(token => {
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        _id: "",
+        email: "",
+        phoneNumber: "",
+        address: "",
+        firstName: "",
+        lastName: ""
       },
-      body: JSON.stringify(usuarioACrear)
+      mostrarCargando: false
     };
-    fetch(`${BASE_URL}${PATH_CUSTOMERS}`, requestOptions)
-      .then(
-        (response) => {
-          response.json();
-          setNewVal(newVal + 1);
-        },
-        (error) => {
-          setIsLoaded(true);
-          setErrors(error);
-        })
-      });
-    setModalInsertar(false);
   }
 
-  const borrarCustomer = (id) => {
-    user.getIdToken(true).then(token => {
-      const requestOptions = {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      };
-      fetch(`${BASE_URL}${PATH_CUSTOMERS}/${id}`, requestOptions)
-        .then(result => result.json())
-        .then(
-          (result) => {
-            setNewVal(newVal + 1);
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
+  componentDidMount() {
+    this.cargarCustomers();
+  }
+
+  mostrarModalActualizar = (dato) => {
+
+    this.setState({ modalActualizar: true, form: dato });
+
+  };
+
+  cerrarModalActualizar = () => {
+    this.setState({ modalActualizar: false });
+  };
+
+  mostrarModalInsertar = () => {
+    this.setState({
+      modalInsertar: true, form: {
+
+        email: "",
+        phoneNumber: "",
+        address: "",
+        firstName: "",
+        lastName: ""
+      }
     });
+  };
+
+  cerrarModalInsertar = () => {
+    this.setState({ modalInsertar: false });
+  };
+
+  editar = (dato) => {
+    this.actualizarCustomer(dato);
+    this.setState({ modalActualizar: false });
+  };
+
+  eliminar = (dato) => {
+    let opcion = window.confirm("¿Está seguro que desea eliminar a " + dato.firstName + "?");
+    if (opcion) {
+      this.borrarCustomer(dato._id)
+    }
+
+  };
+
+  insertar = () => {
+    let usuarioACrear = { ...this.state.form };
+
+    this.crearCustomer(usuarioACrear);
+    this.setState({ modalInsertar: false });
+
   }
 
-  const actualizarCustomer = (customer) => {
-    user.getIdToken(true).then(token => {
-      const requestOptions = {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(customer)
-      };
-      fetch(`${BASE_URL}${PATH_CUSTOMERS}/${customer._id}`, requestOptions)
-        .then(result => result.json())
-        .then(
-          (result) => {
-            setNewVal(newVal + 1);
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
+  handleChange = (e) => {
+    this.setState({
+      form: {
+        ...this.state.form,
+        [e.target.name]: e.target.value,
+      },
     });
-  }
+  };
 
-  if (error) {
-    return <Alert color="danger">
-      Error: {error.message}
-    </Alert>;
-  } else {
+  render() {
+
     return (
-
       <>
+      <NavbarComponents />
         <Container>
-        <Container>
-            <Row className="main-container">
-              <Col className="class-col">
-                <Button color="success" onClick={mostrarModalInsertar}>Crear</Button>
-              </Col>
-              <Col className="class-col">
-              </Col>
-              <Col className="class-col">
-                <Button color="warning" onClick={logout} block>Cerrar sesión</Button>
-              </Col>
-            </Row>
-          </Container>
+        
+        <body background={images.foto1} />
+
+          <h2>Tablero de vendedores</h2>
+          <br />
+          <Button color="success" onClick={() => this.mostrarModalInsertar()}>Crear</Button>
           <br />
           <br />
           <Table>
+            {this.state.mostrarCargando ? (
+              <Spinner
+                size="xl" type="grow"
+                color="primary"
+              />
+            ) : null}
             <thead>
               <tr>
                 <th>Email</th>
@@ -252,7 +133,7 @@ const User = () => {
             </thead>
 
             <tbody>
-              {usuario.data.map((dato) => (
+              {this.state.data.map((dato) => (
                 <tr key={dato._id}>
                   <td>{dato.email}</td>
                   <td>{dato.firstName}</td>
@@ -261,12 +142,12 @@ const User = () => {
                   <td>{dato.phoneNumber}</td>
                   <td>
                     <Button
-                      color="primary" id={dato._id}
-                      onClick={mostrarModalActualizar}
+                      color="primary"
+                      onClick={() => this.mostrarModalActualizar(dato)}
                     >
                       Editar
                     </Button>{" "}
-                    <Button id={dato._id} color="danger" onClick={eliminar}>Eliminar</Button>
+                    <Button color="danger" onClick={() => this.eliminar(dato)}>Eliminar</Button>
                   </td>
                 </tr>
               ))}
@@ -274,9 +155,9 @@ const User = () => {
           </Table>
         </Container>
 
-        <Modal isOpen={modalActualizar}>
+        <Modal isOpen={this.state.modalActualizar}>
           <ModalHeader>
-            <div><h3>Actualizar Usuario {usuario.form._id}</h3></div>
+            <div><h3>Actualizar Usuario {this.state.form._id}</h3></div>
           </ModalHeader>
 
           <ModalBody>
@@ -289,7 +170,7 @@ const User = () => {
                 className="form-control"
                 readOnly
                 type="text"
-                value={usuario.form._id}
+                value={this.state.form._id}
               />
             </FormGroup>
 
@@ -301,8 +182,8 @@ const User = () => {
                 className="form-control"
                 name="email"
                 type="text"
-                onChange={handleChange}
-                value={usuario.form.email}
+                onChange={this.handleChange}
+                value={this.state.form.email}
                 required
               />
             </FormGroup>
@@ -315,8 +196,8 @@ const User = () => {
                 className="form-control"
                 name="firstName"
                 type="text"
-                onChange={handleChange}
-                value={usuario.form.firstName}
+                onChange={this.handleChange}
+                value={this.state.form.firstName}
               />
             </FormGroup>
 
@@ -328,8 +209,8 @@ const User = () => {
                 className="form-control"
                 name="lastName"
                 type="text"
-                onChange={handleChange}
-                value={usuario.form.lastName}
+                onChange={this.handleChange}
+                value={this.state.form.lastName}
               />
             </FormGroup>
 
@@ -341,8 +222,8 @@ const User = () => {
                 className="form-control"
                 name="address"
                 type="text"
-                onChange={handleChange}
-                value={usuario.form.address}
+                onChange={this.handleChange}
+                value={this.state.form.address}
               />
             </FormGroup>
             <FormGroup>
@@ -353,8 +234,8 @@ const User = () => {
                 className="form-control"
                 name="phoneNumber"
                 type="text"
-                onChange={handleChange}
-                value={usuario.form.phoneNumber}
+                onChange={this.handleChange}
+                value={this.state.form.phoneNumber}
               />
             </FormGroup>
           </ModalBody>
@@ -362,13 +243,13 @@ const User = () => {
           <ModalFooter>
             <Button
               color="primary"
-              onClick={editar}
+              onClick={() => this.editar(this.state.form)}
             >
               Actualizar
             </Button>
             <Button
               className="btn btn-danger"
-              onClick={cerrarModalActualizar}
+              onClick={() => this.cerrarModalActualizar()}
             >
               Cancelar
             </Button>
@@ -377,12 +258,13 @@ const User = () => {
 
 
 
-        <Modal isOpen={modalInsertar}>
+        <Modal isOpen={this.state.modalInsertar}>
           <ModalHeader>
             <div><h3>Insertar Usuario</h3></div>
           </ModalHeader>
 
           <ModalBody>
+
             <FormGroup>
               <label>
                 Email:
@@ -391,7 +273,7 @@ const User = () => {
                 className="form-control"
                 name="email"
                 type="text"
-                onChange={handleChange}
+                onChange={this.handleChange}
                 required
               />
             </FormGroup>
@@ -404,7 +286,7 @@ const User = () => {
                 className="form-control"
                 name="firstName"
                 type="text"
-                onChange={handleChange}
+                onChange={this.handleChange}
               />
             </FormGroup>
 
@@ -416,7 +298,7 @@ const User = () => {
                 className="form-control"
                 name="lastName"
                 type="text"
-                onChange={handleChange}
+                onChange={this.handleChange}
               />
             </FormGroup>
 
@@ -428,7 +310,7 @@ const User = () => {
                 className="form-control"
                 name="address"
                 type="text"
-                onChange={handleChange}
+                onChange={this.handleChange}
               />
             </FormGroup>
             <FormGroup>
@@ -439,27 +321,105 @@ const User = () => {
                 className="form-control"
                 name="phoneNumber"
                 type="text"
-                onChange={handleChange}
+                onChange={this.handleChange}
               />
             </FormGroup>
           </ModalBody>
+
           <ModalFooter>
             <Button
               color="primary"
-              onClick={insertar}
+              onClick={() => this.insertar()}
             >
               Insertar
             </Button>
             <Button
               className="btn btn-danger"
-              onClick={cerrarModalInsertar}
+              onClick={() => this.cerrarModalInsertar()}
             >
               Cancelar
             </Button>
           </ModalFooter>
         </Modal>
+        
+        <Footer />
       </>
     );
   }
+
+
+  cargarCustomers() {
+    this.setState({ mostrarCargando: true });
+    fetch(`${BASE_URL}${PATH_CUSTOMERS}`)
+      .then(result => result.json())
+      .then(
+        (result) => {
+          this.setState({ data: result, mostrarCargando: false });
+        },
+        // Nota: es importante manejar errores aquí y no en 
+        // un bloque catch() para que no interceptemos errores
+        // de errores reales en los componentes.
+        (error) => {
+          console.log(error);
+        }
+      )
+  }
+
+
+  crearCustomer(customer) {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(customer)
+    };
+    fetch(`${BASE_URL}${PATH_CUSTOMERS}`, requestOptions)
+      .then(result => result.json())
+      .then(
+        (result) => {
+          this.cargarCustomers();
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+  }
+
+  borrarCustomer(id) {
+    const requestOptions = {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    };
+    fetch(`${BASE_URL}${PATH_CUSTOMERS}/${id}`, requestOptions)
+      .then(result => result.json())
+      .then(
+        (result) => {
+          this.cargarCustomers();
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+  }
+
+  actualizarCustomer(customer) {
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(customer)
+    };
+    fetch(`${BASE_URL}${PATH_CUSTOMERS}/${customer._id}`, requestOptions)
+      .then(result => result.json())
+      .then(
+        (result) => {
+          this.cargarCustomers();
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+  }
+
 }
 export default User;
+
+  

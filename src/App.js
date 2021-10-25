@@ -7,8 +7,9 @@ import {
 import User from './components/User/User';
 import PaginaNoEncontrada from './components/PaginaNoEncontrada/PaginaNoEncontrada';
 import Formulario from './components/Login/Login';
-import ProductPage from './components/producto/ProductPage';
+import Producto from './components/producto/ProductPage';
 import Register from './components/Register/Register';
+
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
         </Route>
 
         <Route path="/producto" exact>
-          <ProductPage />
+          <Producto />
         </Route>
 
         <Route path="/no-encontrada" exact>
